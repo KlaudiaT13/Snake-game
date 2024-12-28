@@ -17,6 +17,21 @@ public class Position {
         return y;
     }
 
+    public void setUP(){
+        y++;
+    }
+
+    public void setDown(){
+        y--;
+    }
+
+    public void setLeft(){
+        x--;
+    }
+    public void setRight(){
+        x++;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
