@@ -1,18 +1,14 @@
 public class State {
-    int A;
-    int B;
-    int snake_x;
-    int snake_y;
-    int apple_x;
-    int apple_y;
+    private int A;
+    private int B;
+    private Position snake;
+    private final Position apple;
 
-    public State(int a, int b, int snake_x, int snake_y, int apple_x, int apple_y) {
+    public State(int a, int b, Position snake, Position apple) {
         A = a;
         B = b;
-        this.snake_x = snake_x;
-        this.snake_y = snake_y;
-        this.apple_x = apple_x;
-        this.apple_y = apple_y;
+        this.snake = snake;
+        this.apple = apple;
     }
 
     public int getA() {
@@ -23,19 +19,15 @@ public class State {
         return B;
     }
 
-    public int getSnake_x() {
-        return snake_x;
+    public Position getSnake() {
+        return snake;
     }
 
-    public int getSnake_y() {
-        return snake_y;
+    public void setSnake(Position snake) {
+        this.snake = snake;
     }
 
-    public int getApple_x() {
-        return apple_x;
-    }
-
-    public int getApple_y() {
-        return apple_y;
+    public Position getApple() {
+        return apple;
     }
 }
