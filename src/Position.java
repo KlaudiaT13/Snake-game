@@ -1,8 +1,8 @@
 import java.util.Objects;
 
 public class Position {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     public Position(int x, int y) {
         this.x = x;
@@ -15,21 +15,6 @@ public class Position {
 
     public int getY() {
         return y;
-    }
-
-    public void setUP(){
-        y++;
-    }
-
-    public void setDown(){
-        y--;
-    }
-
-    public void setLeft(){
-        x--;
-    }
-    public void setRight(){
-        x++;
     }
 
     @Override

@@ -30,4 +30,19 @@ public class State {
     public Position getApple() {
         return apple;
     }
+
+    public void snakeUP(){
+        snake = new Position(snake.getX(), snake.getY() + 1);
+    }
+
+    public void snakeDown(){
+        snake = new Position(snake.getX(), snake.getY() - 1);
+    }
+
+    public void snakeLeft(){
+        snake = new Position(snake.getX() - 1, snake.getY());
+    }
+    public void snakeRight(){
+        snake = new Position(snake.getX() + 1, snake.getY());
+    }
 }

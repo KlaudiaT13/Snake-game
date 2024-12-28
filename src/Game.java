@@ -26,16 +26,13 @@ public class Game {
 
     public String play() {
 
-
-
-
-
         //check if inputs are feasible
         String x = validateState();
         if (x != null) return x;
 
 
         int alpha = 1; //y=alpha * (1/x)
+        int iteratorForAlpha = 2;
 
 
         if(state.getSnake().equals(state.getApple())){
@@ -43,15 +40,15 @@ public class Game {
         };
 
         while(!gameOver && isNumberOfSteepsValid()){
-            positionsToVisit = getToVisit(alpha, visited);
+            positionsToVisit = getToVisit(alpha);
             //fromLeftToRight = !fromLeftToRight;
             Position nextPosition;
             boolean nextPositionReached = false;
             while(!gameOver && !positionsToVisit.isEmpty() && isNumberOfSteepsValid()){
-                nextPosition = findNextPosition(positionsToVisit, state.getSnake());
+                nextPosition = findNextPosition(state.getSnake());
                 nextPositionReached = false;
                 while(!gameOver && !nextPositionReached && isNumberOfSteepsValid()){
-                    Command nextCommand = findNextStep(nextPosition, state.getSnake(), visited);
+                    Command nextCommand = findNextStep(nextPosition, state.getSnake());
                     System.out.println(nextCommand);
                     gameOver = sendSignal(nextCommand);
                     nextPositionReached = state.getSnake().equals(nextPosition);
@@ -60,7 +57,8 @@ public class Game {
 
                 //fromLeftToRight = !fromLeftToRight;
             }
-            alpha++;
+            alpha = alpha + iteratorForAlpha;
+            iteratorForAlpha++;
 
         }
 
@@ -80,16 +78,16 @@ public class Game {
     public boolean sendSignal(Command command){
         switch(command){
             case UP:
-                state.getSnake().setUP();
+                state.snakeUP();
                 break;
             case DOWN:
-                state.getSnake().setDown();
+                state.snakeDown();
                 break;
             case LEFT:
-                state.getSnake().setLeft();
+                state.snakeLeft();
                 break;
             case RIGHT:
-                state.getSnake().setRight();
+                state.snakeRight();
         }
         positionsToVisit.remove(state.getSnake());
         numberOfSteps++;
@@ -97,7 +95,7 @@ public class Game {
         return state.getApple().equals(state.getSnake());
     }
 
-    public Set<Position> getToVisit(int constant, Set<Position> visited){
+    public Set<Position> getToVisit(int constant){
         // gets all positions under f(x) = constant * 1/x
         int x = 1;
         Set<Position> positions = new HashSet<>();
@@ -118,7 +116,7 @@ public class Game {
         return y/(x);
     }
 
-    public Position findNextPosition(Set<Position> positionsToVisit, Position snake){
+    public Position findNextPosition(Position snake){
         if(positionsToVisit.isEmpty()){
             return null;
         }
@@ -127,7 +125,8 @@ public class Game {
         //same x with highest y, or x+1 with highest y
         if(fromLeftToRight){
             int i=0;
-            while(maybe.isEmpty() && i<10){
+//            while(maybe.isEmpty() && i<100){
+            while(maybe.isEmpty() && i<1000){
                 for(Position position : positionsToVisit){
                     if(position.getX() == snake.getX() + i){
                         maybe.add(position);
@@ -137,7 +136,7 @@ public class Game {
             }
             if(maybe.isEmpty()){
                 fromLeftToRight = !fromLeftToRight;
-                next = findNextPosition(positionsToVisit, snake);
+                next = findNextPosition(snake);
             } else{
                 next = maybe.iterator().next();
                 for(Position position : maybe){
@@ -148,7 +147,8 @@ public class Game {
             }
         }else{
             int i=0;
-            while(maybe.isEmpty() && i<10){
+//            while(maybe.isEmpty() && i<100){
+            while(maybe.isEmpty() && i<1000){
                 for(Position position : positionsToVisit){
                     if(position.getY() == snake.getY() + i){
                         maybe.add(position);
@@ -158,7 +158,7 @@ public class Game {
             }
             if(maybe.isEmpty()){
                 fromLeftToRight = !fromLeftToRight;
-                next = findNextPosition(positionsToVisit, snake);
+                next = findNextPosition(snake);
             } else{
                 next = maybe.iterator().next();
                 for(Position position : maybe){
@@ -172,7 +172,7 @@ public class Game {
         return next;
     }
 
-    public Command findNextStep(Position nextPosition, Position snake, Set<Position> visited){
+    public Command findNextStep(Position nextPosition, Position snake){
         //already in the same column
         if(nextPosition.getX() == snake.getX()){
             if(nextPosition.getY() > snake.getY()){
@@ -199,10 +199,10 @@ public class Game {
         }
 
         if(nextPosition.getX() > snake.getX()){
-            if(visited.contains(getRight(snake))){
-                return Command.DOWN;
-            }else{
+            if(visited.contains(getDown(snake))){
                 return Command.RIGHT;
+            }else{
+                return Command.DOWN;
             }
         }
         return null;
@@ -214,6 +214,14 @@ public class Game {
 
     private Position getRight(Position position){
         return new Position(position.getX() + 1, position.getY());
+    }
+
+    private Position getDown(Position position){
+        return new Position(position.getX(), position.getY() - 1);
+    }
+
+    private Position getUp(Position position){
+        return new Position(position.getX(), position.getY() + 1);
     }
 
     private String validateState() {
