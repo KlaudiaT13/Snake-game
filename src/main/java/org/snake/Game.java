@@ -1,3 +1,5 @@
+package org.snake;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,7 +18,7 @@ public class Game {
     int screenSize;
     boolean fromLeftToRight = false;
     int iteration = 2;
-    int howLong = 2;
+    int howLong = 8;
     Set<Position> visited = new HashSet<>();
     Set<Position> positionsToVisit = new HashSet<>();
     Position continueLeft = new Position(-3, 2);
@@ -48,11 +50,11 @@ public class Game {
         while(!gameOver && isNumberOfSteepsValid()){
             while(!gameOver && isNumberOfSteepsValid()){
                 goToNextExtension(continueLeft);
-                followExtension(howLong + iteration);
+                followExtension(howLong);
                 goToNextExtension(continueRight);
-                followExtension(howLong + iteration);
+                followExtension(howLong);
                 howLong += iteration;
-                iteration++;
+                iteration +=100;
             }
         }
 
@@ -132,16 +134,15 @@ public class Game {
     }
 
     private String gameOverMessage() {
+        System.out.println("Number of steps used: " + numberOfSteps);
+//        System.out.println("Visited positions: " + visited.size());
+        double temp = (double) numberOfSteps;
+        double size = (double) screenSize;
+        double screen = Math.sqrt(size) * size;
+        temp = temp/(screenSize*35);
+        System.out.println("usedSteps/upperBound: " + temp);
+        //drawChart();
         if(gameOver){
-            System.out.println("Number of steps: " + numberOfSteps);
-            System.out.println("Visited positions: " + visited.size());
-            double temp = (double) numberOfSteps;
-            double size = (double) screenSize;
-            double screen = Math.sqrt(size) * size;
-            temp = temp/(screen);
-//            temp = temp/(A*B*35);
-            System.out.println(temp);
-            //drawChart();
             return "You win";
         } else {
             return "You lose - too many steps";
@@ -150,9 +151,7 @@ public class Game {
     }
 
     private boolean isNumberOfSteepsValid() {
-//        return numberOfSteps <= 35 * screenSize;
-        double size = (double) screenSize;
-        return numberOfSteps <= Math.sqrt(size) * size;
+        return numberOfSteps <= 200 * screenSize;
     }
 
     public boolean sendSignal(Command command){
@@ -169,50 +168,10 @@ public class Game {
             case RIGHT:
                 state.snakeRight();
         }
-//        positionsToVisit.remove(state.getSnake());
         numberOfSteps++;
         visited.add(state.getCursor());
         return state.getApple().equals(state.getSnake());
     }
-
-//    public Position findNextPosition(){
-//        int sum = 0;
-//        for(int i = 1; i <= iteration; i++){
-//            sum += i;
-//        }
-//        if(fromLeftToRight){
-//            fromLeftToRight = !fromLeftToRight;
-//            return new Position(2*sum, 1);
-//        }else{
-//            fromLeftToRight = !fromLeftToRight;
-//            iteration++;
-//            return new Position(1, 2*sum);
-//        }
-//    }
-
-//    public Command findNextStep(Position nextPosition){
-//        if(!fromLeftToRight){
-//            if(visited.contains(getUp())){}
-//        }
-//
-//        if(nextPosition.getX() < snake.getX()){
-//            if(visited.contains(getLeft(snake))){
-//                return Command.UP;
-//            }else{
-//                return Command.LEFT;
-//            }
-//        }
-//
-//        if(nextPosition.getX() > snake.getX()){
-//            if(visited.contains(getDown(snake))){
-//                return Command.RIGHT;
-//            }else{
-//                return Command.DOWN;
-//            }
-//        }
-//        return null;
-//    }
-
 
     private Position getLeft(Position position){
         return new Position(position.getX() - 1, position.getY());

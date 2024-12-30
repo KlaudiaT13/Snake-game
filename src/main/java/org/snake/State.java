@@ -1,3 +1,5 @@
+package org.snake;
+
 public class State {
     private int A;
     private int B;
