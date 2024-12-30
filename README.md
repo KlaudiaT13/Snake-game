@@ -38,7 +38,7 @@ b) screen: nx1
 ### Implementation
 Let x<sub>n</sub> = (1 + 2 + ... + n)/8
 After creating starting single zigzag of length 8, snake starts spinning around it, clockwise, as tightly to it as possible to not create any gaps, but also does not visit any field twice.
-When snake gets to the position, where lies current end of main zigzag lies, snake stops the spin and lengthens the main zigzag by x<sub>n</sub>, where n is number of full loops/spins that snake has drawn.
+When snake gets to the position, where the current end of main zigzag lies, snake stops the spin and lengthens the main zigzag by x<sub>n</sub>, where n is number of full loops/spins that snake has drawn.
 
 ### Complexity
 All values that I tested fulfilled numberOfSteps <= 35 * S condition. Compared to the first algorithm, where it was clear which field will be visited last, in this one, it is hard to determine the worst case. The one thing, I am confidently able to say, is that this algorithm is strictly better than the first one. Even if some tests fail 35 * S condition, I think some slight correction of x<sub>n</sub> (lengthening of zigzag) could be found, so that the algorithm always fulfills numberOfSteps <= 35 * S. 
