@@ -38,42 +38,42 @@ public class State {
     }
 
     public void snakeUP(){
-        snake = new Position(snake.getX(), snake.getY() + 1);
+        cursor = new Position(cursor.getX(), cursor.getY() + 1);
 
-        if (cursor.getY() == B) {
-            cursor = new Position(cursor.getX(), 1);
+        if (snake.getY() == B) {
+            snake = new Position(snake.getX(), 1);
         } else {
-            cursor = new Position(cursor.getX(), cursor.getY() + 1);
+            snake = new Position(snake.getX(), snake.getY() + 1);
         }
     }
 
     public void snakeDown(){
-        snake = new Position(snake.getX(), snake.getY() - 1);
+        cursor = new Position(cursor.getX(), cursor.getY() - 1);
 
-        if (cursor.getY() == 1) {
-            cursor = new Position(cursor.getX(), B);
+        if (snake.getY() == 1) {
+            snake = new Position(snake.getX(), B);
         } else {
-            cursor = new Position(cursor.getX(), cursor.getY() - 1);
+            snake = new Position(snake.getX(), snake.getY() - 1);
         }
     }
 
     public void snakeLeft(){
-        snake = new Position(snake.getX() - 1, snake.getY());
+        cursor = new Position(cursor.getX() - 1, cursor.getY());
 
-        if (cursor.getX() == 1) {
-            cursor = new Position(A, cursor.getY());
+        if (snake.getX() == 1) {
+            snake = new Position(A, snake.getY());
         } else {
-            cursor = new Position(cursor.getX() - 1, cursor.getY());
+            snake = new Position(snake.getX() - 1, snake.getY());
         }
     }
 
     public void snakeRight(){
-        snake = new Position(snake.getX() + 1, snake.getY());
+        cursor = new Position(cursor.getX() + 1, cursor.getY());
 
-        if (cursor.getX() == A) {
-            cursor = new Position(1, cursor.getY());
+        if (snake.getX() == A) {
+            snake = new Position(1, snake.getY());
         } else {
-            cursor = new Position(cursor.getX() + 1, cursor.getY());
+            snake = new Position(snake.getX() + 1, snake.getY());
         }
     }
 }
