@@ -34,7 +34,8 @@ b) screen: nx1
 
 ### Example
 3x3 screen can be moved alongside zigzag of length 9 as follows:  
-
+![example1.png](example1.png)  
+![example2.png](example2.png)  
 ### Implementation
 Let x<sub>n</sub> = 100 * (1 + 2 + 3 + ... + n)
 After creating starting single zigzag of length 8, snake starts spinning around it, clockwise, as tightly to it as possible to not create any gaps, but also does not visit any field twice.
