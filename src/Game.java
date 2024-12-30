@@ -1,3 +1,6 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,7 +15,7 @@ public class Game {
     int B;
     int screenSize;
     boolean fromLeftToRight = true;
-
+    int iteration = 2;
     Set<Position> visited = new HashSet<>();
     Set<Position> positionsToVisit = new HashSet<>();
 
@@ -31,40 +34,34 @@ public class Game {
         if (x != null) return x;
 
 
-        int alpha = 1; //y=alpha * (1/x)
-        int iteratorForAlpha = 2;
-
-
         if(state.getSnake().equals(state.getApple())){
             gameOver = true;
         };
 
+        Position nextPosition;
         while(!gameOver && isNumberOfSteepsValid()){
-            positionsToVisit = getToVisit(alpha);
-            //fromLeftToRight = !fromLeftToRight;
-            Position nextPosition;
             boolean nextPositionReached = false;
-            while(!gameOver && !positionsToVisit.isEmpty() && isNumberOfSteepsValid()){
-                nextPosition = findNextPosition(state.getSnake());
-                nextPositionReached = false;
-                while(!gameOver && !nextPositionReached && isNumberOfSteepsValid()){
-                    Command nextCommand = findNextStep(nextPosition, state.getSnake());
-                    System.out.println(nextCommand);
-                    gameOver = sendSignal(nextCommand);
-                    nextPositionReached = state.getSnake().equals(nextPosition);
-                }
-
-
-                //fromLeftToRight = !fromLeftToRight;
+            nextPosition = findNextPosition();
+            while(!gameOver && !nextPositionReached && isNumberOfSteepsValid()){
+                Command nextCommand = findNextStep(nextPosition, state.getSnake());
+//                    System.out.println(nextCommand);
+                gameOver = sendSignal(nextCommand);
+                nextPositionReached = state.getSnake().equals(nextPosition);
             }
-            alpha = alpha + iteratorForAlpha;
-            iteratorForAlpha++;
-
         }
 
         if(gameOver){
+            System.out.println("Number of steps: " + numberOfSteps);
+            System.out.println("Visited positions: " + visited.size());
+            double temp = (double) numberOfSteps;
+            double size = (double) screenSize;
+            double screen = Math.sqrt(size) * size;
+            temp = temp/(screen);
+//            temp = temp/(A*B*35);
+            System.out.println(temp);
+            //drawChart();
             return "You win";
-        }else{
+        } else {
             return "You lose - too many steps";
         }
 
@@ -72,7 +69,9 @@ public class Game {
     }
 
     private boolean isNumberOfSteepsValid() {
-        return numberOfSteps <= 35 * screenSize;
+//        return numberOfSteps <= 35 * screenSize;
+        double size = (double) screenSize;
+        return numberOfSteps <= Math.sqrt(size) * size;
     }
 
     public boolean sendSignal(Command command){
@@ -92,84 +91,22 @@ public class Game {
         positionsToVisit.remove(state.getSnake());
         numberOfSteps++;
         visited.add(state.getSnake());
-        return state.getApple().equals(state.getSnake());
+        return state.getApple().equals(state.getCursor());
     }
 
-    public Set<Position> getToVisit(int constant){
-        // gets all positions under f(x) = constant * 1/x
-        int x = 1;
-        Set<Position> positions = new HashSet<>();
-        while(function(constant, x) >= 1){
-            for(int i = 1; i <= function(constant, x); i++){
-                Position position = new Position(x, i);
-                if(!visited.contains(position)){
-                    positions.add(position);
-                }
-            }
-            x++;
+    public Position findNextPosition(){
+        int sum = 0;
+        for(int i = 1; i <= iteration; i++){
+            sum += i;
         }
-        return positions;
-    }
-
-    public double function(int A, int x){
-        double y = (double) A;
-        return y/(x);
-    }
-
-    public Position findNextPosition(Position snake){
-        if(positionsToVisit.isEmpty()){
-            return null;
-        }
-        Position next = null;
-        Set<Position> maybe = new HashSet<>();
-        //same x with highest y, or x+1 with highest y
         if(fromLeftToRight){
-            int i=0;
-//            while(maybe.isEmpty() && i<100){
-            while(maybe.isEmpty() && i<1000){
-                for(Position position : positionsToVisit){
-                    if(position.getX() == snake.getX() + i){
-                        maybe.add(position);
-                    }
-                }
-                i++;
-            }
-            if(maybe.isEmpty()){
-                fromLeftToRight = !fromLeftToRight;
-                next = findNextPosition(snake);
-            } else{
-                next = maybe.iterator().next();
-                for(Position position : maybe){
-                    if(position.getY() > next.getY()){
-                        next = position;
-                    }
-                }
-            }
+            fromLeftToRight = !fromLeftToRight;
+            return new Position(2*sum, 1);
         }else{
-            int i=0;
-//            while(maybe.isEmpty() && i<100){
-            while(maybe.isEmpty() && i<1000){
-                for(Position position : positionsToVisit){
-                    if(position.getY() == snake.getY() + i){
-                        maybe.add(position);
-                    }
-                }
-                i++;
-            }
-            if(maybe.isEmpty()){
-                fromLeftToRight = !fromLeftToRight;
-                next = findNextPosition(snake);
-            } else{
-                next = maybe.iterator().next();
-                for(Position position : maybe){
-                    if(position.getX() > next.getX()){
-                        next = position;
-                    }
-                }
-            }
-
+            fromLeftToRight = !fromLeftToRight;
+            iteration++;
+            return new Position(1, 2*sum);
         }
-        return next;
     }
 
     public Command findNextStep(Position nextPosition, Position snake){
@@ -237,4 +174,43 @@ public class Game {
         return null;
     }
 
+    private void drawChart() {
+        int maxX = 0;
+        int maxY = 0;
+
+        for (Position position : visited) {
+            maxX = Math.max(maxX, position.getX());
+            maxY = Math.max(maxY, position.getY());
+        }
+
+        int[][]drawMatrix = new int[maxX][maxY];
+
+        for (Position position : visited) {
+            drawMatrix[position.getX()-1][position.getY()-1] = 1;
+        }
+
+        try {
+            FileWriter fileWriter = new FileWriter("chart.txt");
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+
+            for (int j = maxY-1; j >=0; j--) {
+                for (int i = 0; i < maxX; i++) {
+                    if (drawMatrix[i][j] == 1) {
+//                    System.out.print("*  ");
+                        printWriter.print("*");
+                    } else {
+//                        System.out.print(" ");
+                        printWriter.print(" ");
+                    }
+                }
+//                System.out.println();
+                printWriter.println();
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
 }
