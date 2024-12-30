@@ -14,10 +14,13 @@ public class Game {
     int A;
     int B;
     int screenSize;
-    boolean fromLeftToRight = true;
+    boolean fromLeftToRight = false;
     int iteration = 2;
+    int howLong = 2;
     Set<Position> visited = new HashSet<>();
     Set<Position> positionsToVisit = new HashSet<>();
+    Position continueLeft = new Position(-3, 2);
+    Position continueRight = new Position(3, -2);
 
     public Game(State state) {
         this.state = state;
@@ -38,18 +41,97 @@ public class Game {
             gameOver = true;
         };
 
-        Position nextPosition;
+        if(start() != null && !gameOver){
+            return start();
+        }
+
         while(!gameOver && isNumberOfSteepsValid()){
-            boolean nextPositionReached = false;
-            nextPosition = findNextPosition();
-            while(!gameOver && !nextPositionReached && isNumberOfSteepsValid()){
-                Command nextCommand = findNextStep(nextPosition, state.getSnake());
-//                    System.out.println(nextCommand);
-                gameOver = sendSignal(nextCommand);
-                nextPositionReached = state.getSnake().equals(nextPosition);
+            while(!gameOver && isNumberOfSteepsValid()){
+                goToNextExtension(continueLeft);
+                followExtension(howLong + iteration);
+                goToNextExtension(continueRight);
+                followExtension(howLong + iteration);
+                howLong += iteration;
+                iteration++;
             }
         }
 
+        return gameOverMessage();
+    }
+
+    private void goToNextExtension(Position nextPosition){
+        if(!fromLeftToRight){
+            while (!gameOver && isNumberOfSteepsValid() && !state.getCursor().equals(nextPosition)){
+                if(visited.contains(getUp(state.getCursor()))){
+                    gameOver = sendSignal(Command.LEFT);
+                } else{
+                    gameOver = sendSignal(Command.UP);
+                }
+            }
+        } else{
+            while (!gameOver && isNumberOfSteepsValid() && !state.getCursor().equals(nextPosition)){
+                if(visited.contains(getDown(state.getCursor()))){
+                    gameOver = sendSignal(Command.RIGHT);
+                } else {
+                    gameOver = sendSignal(Command.DOWN);
+                }
+            }
+        }
+    }
+
+    private void followExtension(int howLong){
+        int i = 0;
+        boolean vertical = true;
+        if(fromLeftToRight){
+            while(i<howLong && isNumberOfSteepsValid() && !gameOver){
+                if(vertical){
+                    gameOver = sendSignal(Command.DOWN);
+                    i++;
+                } else{
+                    gameOver = sendSignal(Command.RIGHT);
+                }
+                vertical = !vertical;
+            }
+            continueRight = getRight(state.getCursor());
+        } else{
+            while(i<howLong && isNumberOfSteepsValid() && !gameOver){
+                if(vertical){
+                    gameOver = sendSignal(Command.UP);
+                    i++;
+                } else {
+                    gameOver = sendSignal(Command.LEFT);
+                }
+                vertical = !vertical;
+            }
+            continueLeft = getLeft(state.getCursor());
+        }
+
+        fromLeftToRight = !fromLeftToRight;
+    }
+
+    private String start(){
+        gameOver = sendSignal(Command.DOWN);
+        if(gameOver || !isNumberOfSteepsValid()) return gameOverMessage();
+        gameOver = sendSignal(Command.RIGHT);
+        if(gameOver || !isNumberOfSteepsValid()) return gameOverMessage();
+        gameOver = sendSignal(Command.DOWN);
+        if(gameOver || !isNumberOfSteepsValid()) return gameOverMessage();
+        gameOver = sendSignal(Command.RIGHT);
+        if(gameOver || !isNumberOfSteepsValid()) return gameOverMessage();
+
+        gameOver = sendSignal(Command.RIGHT);
+        if(gameOver || !isNumberOfSteepsValid()) return gameOverMessage();
+        gameOver = sendSignal(Command.DOWN);
+        if(gameOver || !isNumberOfSteepsValid()) return gameOverMessage();
+        gameOver = sendSignal(Command.RIGHT);
+        if(gameOver || !isNumberOfSteepsValid()) return gameOverMessage();
+        gameOver = sendSignal(Command.DOWN);
+        if(gameOver || !isNumberOfSteepsValid()) return gameOverMessage();
+
+        return null;
+    }
+
+    private String gameOverMessage() {
         if(gameOver){
             System.out.println("Number of steps: " + numberOfSteps);
             System.out.println("Visited positions: " + visited.size());
@@ -64,7 +146,6 @@ public class Game {
         } else {
             return "You lose - too many steps";
         }
-
 
     }
 
@@ -88,62 +169,50 @@ public class Game {
             case RIGHT:
                 state.snakeRight();
         }
-        positionsToVisit.remove(state.getSnake());
+//        positionsToVisit.remove(state.getSnake());
         numberOfSteps++;
-        visited.add(state.getSnake());
-        return state.getApple().equals(state.getCursor());
+        visited.add(state.getCursor());
+        return state.getApple().equals(state.getSnake());
     }
 
-    public Position findNextPosition(){
-        int sum = 0;
-        for(int i = 1; i <= iteration; i++){
-            sum += i;
-        }
-        if(fromLeftToRight){
-            fromLeftToRight = !fromLeftToRight;
-            return new Position(2*sum, 1);
-        }else{
-            fromLeftToRight = !fromLeftToRight;
-            iteration++;
-            return new Position(1, 2*sum);
-        }
-    }
+//    public Position findNextPosition(){
+//        int sum = 0;
+//        for(int i = 1; i <= iteration; i++){
+//            sum += i;
+//        }
+//        if(fromLeftToRight){
+//            fromLeftToRight = !fromLeftToRight;
+//            return new Position(2*sum, 1);
+//        }else{
+//            fromLeftToRight = !fromLeftToRight;
+//            iteration++;
+//            return new Position(1, 2*sum);
+//        }
+//    }
 
-    public Command findNextStep(Position nextPosition, Position snake){
-        //already in the same column
-        if(nextPosition.getX() == snake.getX()){
-            if(nextPosition.getY() > snake.getY()){
-                return Command.UP;
-            }else {
-                return Command.DOWN;
-            }
-        }
-        //already in the same row
-        if(nextPosition.getY() == snake.getY()){
-            if(nextPosition.getX() > snake.getX()){
-                return Command.RIGHT;
-            }else {
-                return Command.LEFT;
-            }
-        }
+//    public Command findNextStep(Position nextPosition){
+//        if(!fromLeftToRight){
+//            if(visited.contains(getUp())){}
+//        }
+//
+//        if(nextPosition.getX() < snake.getX()){
+//            if(visited.contains(getLeft(snake))){
+//                return Command.UP;
+//            }else{
+//                return Command.LEFT;
+//            }
+//        }
+//
+//        if(nextPosition.getX() > snake.getX()){
+//            if(visited.contains(getDown(snake))){
+//                return Command.RIGHT;
+//            }else{
+//                return Command.DOWN;
+//            }
+//        }
+//        return null;
+//    }
 
-        if(nextPosition.getX() < snake.getX()){
-            if(visited.contains(getLeft(snake))){
-                return Command.UP;
-            }else{
-                return Command.LEFT;
-            }
-        }
-
-        if(nextPosition.getX() > snake.getX()){
-            if(visited.contains(getDown(snake))){
-                return Command.RIGHT;
-            }else{
-                return Command.DOWN;
-            }
-        }
-        return null;
-    }
 
     private Position getLeft(Position position){
         return new Position(position.getX() - 1, position.getY());
