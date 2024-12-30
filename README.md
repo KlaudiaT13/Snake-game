@@ -36,7 +36,7 @@ b) screen: nx1
 3x3 screen can be moved alongside zigzag of length 9 as follows:  
 
 ### Implementation
-Let x<sub>n</sub> = (1 + 2 + ... + n)/8
+Let x<sub>n</sub> = 100 * (1 + 2 + 3 + ... + n)
 After creating starting single zigzag of length 8, snake starts spinning around it, clockwise, as tightly to it as possible to not create any gaps, but also does not visit any field twice.
 When snake gets to the position, where the current end of main zigzag lies, snake stops the spin and lengthens the main zigzag by x<sub>n</sub>, where n is number of full loops/spins that snake has drawn.
 
