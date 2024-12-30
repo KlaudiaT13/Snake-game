@@ -34,8 +34,9 @@ b) screen: nx1
 
 ### Example
 3x3 screen can be moved alongside zigzag of length 9 as follows:  
-![example1.png](example1.png)  
-![example2.png](example2.png)  
+<img src="example1.png" width="500"/>
+<img src="example2.png" width="500"/>  
+After adjusting initial zigzag, we don't need any extra steps. The same number of steps we needed to cover for test cases 1x9 and 9x1 sufficed to cover all three of them (1x9, 9x1, 3x3).
 ### Implementation
 Let x<sub>n</sub> = 100 * (1 + 2 + 3 + ... + n)
 After creating starting single zigzag of length 8, snake starts spinning around it, clockwise, as tightly to it as possible to not create any gaps, but also does not visit any field twice.
